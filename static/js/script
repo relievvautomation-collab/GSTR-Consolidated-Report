@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const summarySheetCount = document.getElementById('summarySheetCount');
     const summaryRowCount = document.getElementById('summaryRowCount');
     const summaryMonthCount = document.getElementById('summaryMonthCount');
-    const previewBody = document.getElementById('previewBody');
-    const tableHeader = document.getElementById('tableHeader');
     const gstinValue = document.getElementById('gstinValue');
     const fyValue = document.getElementById('fyValue');
     const monthsValue = document.getElementById('monthsValue');
@@ -30,6 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalMonthCount = document.getElementById('modalMonthCount');
     const modalRowCount = document.getElementById('modalRowCount');
     const modalGSTIN = document.getElementById('modalGSTIN');
+    const previewTabs = document.getElementById('previewTabs');
+    const previewTabContent = document.getElementById('previewTabContent');
+
+    // Return type buttons
+    const gstr1Btn = document.getElementById('gstr1Btn');
+    const gstr3bBtn = document.getElementById('gstr3bBtn');
+    const gstr2aBtn = document.getElementById('gstr2aBtn');
+    let selectedReturnType = 'GSTR-3B'; // default
 
     // Info tabs
     const infoTabs = document.querySelectorAll('.info-tab');
@@ -38,10 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
     infoTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const target = tab.getAttribute('data-tab');
-            // Remove active class from all tabs and panes
             infoTabs.forEach(t => t.classList.remove('active'));
             tabPanes.forEach(p => p.classList.remove('active'));
-            // Add active class to current tab and pane
             tab.classList.add('active');
             document.getElementById(target + '-tab').classList.add('active');
         });
@@ -50,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentToken = null;
     let previewData = null;
 
-    // Stats counters (simple simulation)
+    // Stats counters
     let totalProcessed = parseInt(localStorage.getItem('totalProcessed') || '0');
     let todayProcessed = parseInt(localStorage.getItem('todayProcessed') || '0');
     const today = new Date().toDateString();
@@ -71,6 +75,37 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('totalFilesCounter').textContent = totalProcessed;
         document.getElementById('todayFilesCounter').textContent = todayProcessed;
     }
+
+    // Return type toggle
+    gstr1Btn.addEventListener('click', () => {
+        gstr1Btn.classList.add('active', 'btn-primary');
+        gstr1Btn.classList.remove('btn-secondary');
+        gstr3bBtn.classList.remove('active', 'btn-primary');
+        gstr3bBtn.classList.add('btn-secondary');
+        gstr2aBtn.classList.remove('active', 'btn-primary');
+        gstr2aBtn.classList.add('btn-secondary');
+        selectedReturnType = 'GSTR-1';
+    });
+
+    gstr3bBtn.addEventListener('click', () => {
+        gstr3bBtn.classList.add('active', 'btn-primary');
+        gstr3bBtn.classList.remove('btn-secondary');
+        gstr1Btn.classList.remove('active', 'btn-primary');
+        gstr1Btn.classList.add('btn-secondary');
+        gstr2aBtn.classList.remove('active', 'btn-primary');
+        gstr2aBtn.classList.add('btn-secondary');
+        selectedReturnType = 'GSTR-3B';
+    });
+
+    gstr2aBtn.addEventListener('click', () => {
+        gstr2aBtn.classList.add('active', 'btn-primary');
+        gstr2aBtn.classList.remove('btn-secondary');
+        gstr1Btn.classList.remove('active', 'btn-primary');
+        gstr1Btn.classList.add('btn-secondary');
+        gstr3bBtn.classList.remove('active', 'btn-primary');
+        gstr3bBtn.classList.add('btn-secondary');
+        selectedReturnType = 'GSTR-2A';
+    });
 
     // File selection via browse button
     browseButton.addEventListener('click', () => fileInput.click());
@@ -98,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const files = fileInput.files;
         fileCountSpan.textContent = files.length;
         summaryFileCount.textContent = files.length;
-        // Enable merge button if files selected
         mergeBtn.disabled = files.length === 0;
     }
 
@@ -112,32 +146,35 @@ document.addEventListener('DOMContentLoaded', function() {
         summaryMonthCount.textContent = '0';
         mergeBtn.disabled = true;
         downloadBtn.disabled = true;
-        previewBody.innerHTML = '<tr><td colspan="100" style="text-align:center; padding:4rem;"><i class="fas fa-file-excel" style="font-size:3rem;"></i><h3>No Data to Display</h3><p>Upload JSON files and click "Consolidate Files".</p></td></tr>';
         gstinValue.textContent = 'Not Available';
         fyValue.textContent = 'Not Available';
         monthsValue.textContent = '0';
         monthCounter.style.display = 'none';
         previewInfo.textContent = 'No data parsed. Upload JSON files and click "Consolidate Files".';
         rowCountInfo.textContent = 'Showing 0 rows';
-        tableHeader.innerHTML = '<th>S.No</th><th>Particulars</th><th>Total</th>';
+        previewTabs.innerHTML = '';
+        previewTabContent.innerHTML = '';
         currentToken = null;
         previewData = null;
     });
 
-    // Merge / Consolidate button
+    // Merge / Consolidate button with loading animation
     mergeBtn.addEventListener('click', async () => {
         const files = fileInput.files;
         if (files.length === 0) return;
 
-        // Show progress
+        // Show progress and loading state on button
         progressBar.style.display = 'block';
         progressFill.style.width = '10%';
         mergeBtn.disabled = true;
+        const originalText = mergeBtn.innerHTML;
+        mergeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
         const formData = new FormData();
         for (let file of files) {
             formData.append('files[]', file);
         }
+        formData.append('returnType', selectedReturnType);
 
         try {
             const response = await fetch('/upload', {
@@ -148,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.error) {
                 alert('Error: ' + result.error);
                 mergeBtn.disabled = false;
+                mergeBtn.innerHTML = originalText;
                 progressBar.style.display = 'none';
                 return;
             }
@@ -160,23 +198,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Update summary cards
             summaryFileCount.textContent = result.fileCount;
-            summarySheetCount.textContent = result.sheetCount; // now 2
+            summarySheetCount.textContent = result.sheetCount;
             summaryRowCount.textContent = result.rowCount;
-            summaryMonthCount.textContent = result.preview.meta.months.length;
-            monthsValue.textContent = result.preview.meta.months.length;
+            summaryMonthCount.textContent = result.monthCount;
+            monthsValue.textContent = result.monthCount;
             gstinValue.textContent = result.preview.meta.gstin || 'Not Available';
             fyValue.textContent = result.preview.meta.financial_year || 'Not Available';
             monthCounter.style.display = 'flex';
-            counterValue.textContent = result.preview.meta.months.length;
+            counterValue.textContent = result.monthCount;
 
-            // Build preview table
-            buildPreviewTable(result.preview);
+            // Build preview based on type
+            if (result.preview.type === 'GSTR-1') {
+                buildGSTR1Preview(result.preview);
+            } else if (result.preview.type === 'GSTR-2A') {
+                buildGSTR2APreview(result.preview);
+            } else {
+                buildGSTR3BPreview(result.preview);
+            }
 
-            // Store token and preview data
             currentToken = result.token;
             previewData = result.preview;
             downloadBtn.disabled = false;
             mergeBtn.disabled = false;
+            mergeBtn.innerHTML = originalText;
 
             updateStats();
 
@@ -184,39 +228,171 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(err);
             alert('Upload failed. Check console.');
             mergeBtn.disabled = false;
+            mergeBtn.innerHTML = originalText;
             progressBar.style.display = 'none';
         }
     });
 
-    function buildPreviewTable(data) {
+    function buildGSTR3BPreview(data) {
         const months = data.meta.months;
         const rows = data.rows;
 
-        // Build header
-        let headerHtml = '<th>S.No</th><th>Particulars</th>';
+        previewTabs.innerHTML = '';
+        previewTabContent.innerHTML = '';
+
+        let headerHtml = '<tr><th>S.No</th><th>Particulars</th>';
         months.forEach(m => {
             headerHtml += `<th>${m}</th>`;
         });
-        headerHtml += '<th>Total</th>';
-        tableHeader.innerHTML = headerHtml;
+        headerHtml += '<th>Total</th></tr>';
 
-        // Build body
         let bodyHtml = '';
         rows.forEach((r, idx) => {
             bodyHtml += '<tr>';
             bodyHtml += `<td>${idx + 1}</td>`;
             bodyHtml += `<td>${r.label}</td>`;
             r.values.forEach(v => {
-                const val = (typeof v === 'number') ? v.toFixed(2) : v;
+                const val = formatIndianNumber(v);
                 bodyHtml += `<td class="${v === 0 ? 'zero-value' : ''}">${val}</td>`;
             });
-            const total = (typeof r.total === 'number') ? r.total.toFixed(2) : r.total;
+            const total = formatIndianNumber(r.total);
             bodyHtml += `<td class="${r.total === 0 ? 'zero-value' : ''}">${total}</td>`;
             bodyHtml += '</tr>';
         });
-        previewBody.innerHTML = bodyHtml;
+
+        previewTabContent.innerHTML = `
+            <div class="table-wrapper">
+                <table class="preview-table">
+                    <thead>${headerHtml}</thead>
+                    <tbody>${bodyHtml}</tbody>
+                </table>
+            </div>
+        `;
+
         previewInfo.textContent = `Consolidated report for ${months.length} months.`;
         rowCountInfo.textContent = `Showing ${rows.length} rows`;
+    }
+
+    function buildGSTR1Preview(data) {
+        previewTabs.innerHTML = '';
+        previewTabContent.innerHTML = '';
+
+        const sheetNames = ['b2b', 'b2cs', 'cdnr', 'hsn'];
+        sheetNames.forEach((name, idx) => {
+            const sheet = data.sheets[name];
+            if (!sheet) return;
+
+            const tabBtn = document.createElement('button');
+            tabBtn.className = `preview-tab ${idx === 0 ? 'active' : ''}`;
+            tabBtn.setAttribute('data-tab', name);
+            let displayName = name.toUpperCase();
+            if (name === 'b2b') displayName = 'B2B, SEZ, DE';
+            tabBtn.textContent = displayName;
+            previewTabs.appendChild(tabBtn);
+
+            const pane = document.createElement('div');
+            pane.className = `tab-pane ${idx === 0 ? 'active' : ''}`;
+            pane.id = `tab-${name}`;
+
+            let tableHtml = '<div class="table-wrapper"><table class="preview-table"><thead><tr>';
+            sheet.columns.forEach(col => {
+                tableHtml += `<th>${col}</th>`;
+            });
+            tableHtml += '</tr></thead><tbody>';
+            sheet.rows.forEach(row => {
+                tableHtml += '<tr>';
+                row.forEach(cell => {
+                    tableHtml += `<td>${cell}</td>`;
+                });
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</tbody></table></div>';
+            pane.innerHTML = tableHtml;
+            previewTabContent.appendChild(pane);
+        });
+
+        document.querySelectorAll('.preview-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        previewInfo.textContent = `Consolidated GSTR-1 for ${data.meta.months.length} months.`;
+        rowCountInfo.textContent = `Showing multiple sheets.`;
+    }
+
+    function buildGSTR2APreview(data) {
+        previewTabs.innerHTML = '';
+        previewTabContent.innerHTML = '';
+
+        const sheets = ['b2b', 'cdn', 'tcs'];
+        sheets.forEach((name, idx) => {
+            const sheet = data.sheets[name];
+            if (!sheet) return;
+
+            const tabBtn = document.createElement('button');
+            tabBtn.className = `preview-tab ${idx === 0 ? 'active' : ''}`;
+            tabBtn.setAttribute('data-tab', name);
+            tabBtn.textContent = name.toUpperCase();
+            previewTabs.appendChild(tabBtn);
+
+            const pane = document.createElement('div');
+            pane.className = `tab-pane ${idx === 0 ? 'active' : ''}`;
+            pane.id = `tab-${name}`;
+
+            let tableHtml = '<div class="table-wrapper"><table class="preview-table"><thead><tr>';
+            sheet.columns.forEach(col => {
+                tableHtml += `<th>${col}</th>`;
+            });
+            tableHtml += '</tr></thead><tbody>';
+            sheet.rows.forEach(row => {
+                tableHtml += '<tr>';
+                row.forEach(cell => {
+                    const val = (typeof cell === 'number') ? formatIndianNumber(cell) : (cell || '');
+                    tableHtml += `<td>${val}</td>`;
+                });
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</tbody></table></div>';
+            pane.innerHTML = tableHtml;
+            previewTabContent.appendChild(pane);
+        });
+
+        document.querySelectorAll('.preview-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        previewInfo.textContent = `Consolidated GSTR-2A for ${data.meta.months.length} months.`;
+        rowCountInfo.textContent = `Showing multiple sheets.`;
+    }
+
+    // Indian number formatting for preview
+    function formatIndianNumber(num) {
+        if (num === null || num === undefined) return "0.00";
+        let n = parseFloat(num);
+        if (isNaN(n)) return num;
+        let s = n.toFixed(2);
+        let [intPart, decPart] = s.split('.');
+        if (intPart.length > 3) {
+            let lastThree = intPart.slice(-3);
+            let rest = intPart.slice(0, -3);
+            let restGroups = [];
+            while (rest.length > 0) {
+                restGroups.push(rest.slice(-2));
+                rest = rest.slice(0, -2);
+            }
+            restGroups.reverse();
+            intPart = restGroups.join(',') + ',' + lastThree;
+        }
+        return intPart + '.' + decPart;
     }
 
     // Download button click -> show modal
@@ -224,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!currentToken || !previewData) return;
         modalFileCount.textContent = summaryFileCount.textContent;
         modalMonthCount.textContent = previewData.meta.months.length;
-        modalRowCount.textContent = previewData.rows.length;
+        modalRowCount.textContent = summaryRowCount.textContent;
         modalGSTIN.textContent = previewData.meta.gstin || '-';
         modal.style.display = 'flex';
     });
@@ -243,33 +419,30 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'none';
     });
 
-    // Initialize: set summary sheet count to 0
-    summarySheetCount.textContent = '0';
-});
-    // Instructions popup logic
+    // Instructions popup (opens automatically on first visit)
     const instructionModal = document.getElementById('instructionModal');
     const closeInstructionModal = document.getElementById('closeInstructionModal');
     const viewInstructionsBtn = document.getElementById('viewInstructionsBtn');
 
-    // Show instructions popup automatically on first visit (using localStorage)
     if (!localStorage.getItem('instructionsShown')) {
         instructionModal.style.display = 'flex';
         localStorage.setItem('instructionsShown', 'true');
     }
 
-    // Close button
     closeInstructionModal.addEventListener('click', () => {
         instructionModal.style.display = 'none';
     });
 
-    // View Instructions button
     viewInstructionsBtn.addEventListener('click', () => {
         instructionModal.style.display = 'flex';
     });
 
-    // Click outside to close (optional)
     window.addEventListener('click', (e) => {
         if (e.target === instructionModal) {
             instructionModal.style.display = 'none';
         }
     });
+
+    // Initialize: set summary sheet count to 0
+    summarySheetCount.textContent = '0';
+});
