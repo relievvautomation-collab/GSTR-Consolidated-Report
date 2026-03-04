@@ -323,6 +323,33 @@ body {
     box-shadow: none !important;
 }
 
+/* Return type selector */
+.return-type-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.return-type-btn {
+    min-width: 100px; /* same as reset button */
+    padding: 0.8rem 1.5rem;
+}
+.return-type-btn.active {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+.return-type-btn.btn-secondary {
+    background: white;
+    color: var(--accent-blue);
+    border: 2px solid var(--border-blue);
+}
+.return-type-btn.btn-primary {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+}
+
 /* Preview Section */
 .preview-section {
     background: white;
@@ -504,47 +531,6 @@ body {
     font-style: italic;
 }
 
-.pdf-preview-container {
-    flex: 1;
-    overflow: auto;
-    padding: 1rem;
-    background: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.pdf-canvas-container {
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    background: white;
-    border: 1px solid var(--border-blue);
-}
-
-.pdf-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.pdf-controls button {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-blue);
-    background: white;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.pdf-controls button:hover {
-    background: var(--light-blue);
-    border-color: var(--accent-blue);
-}
-
 /* Info Panel */
 .info-panel {
     background: white;
@@ -633,6 +619,127 @@ body {
     display: flex;
     align-items: center;
     gap: 0.8rem;
+}
+
+/* ===== FAQ Section (Redesigned) ===== */
+.faq-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.faq-item {
+    background: #f9fbfe;
+    border-left: 4px solid var(--accent-blue);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px var(--shadow-light);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--shadow-medium);
+}
+
+.faq-item h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--primary-blue);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+}
+
+.faq-item h3 i {
+    color: var(--accent-blue);
+    font-size: 1.2rem;
+}
+
+.faq-item p {
+    color: var(--text-medium);
+    line-height: 1.7;
+    margin-left: 2.2rem; /* align with text after icon */
+    font-size: 0.95rem;
+}
+
+/* Remove bottom border from old style */
+.faq-item {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 1.5rem;
+}
+
+/* Responsive FAQ */
+@media (max-width: 768px) {
+    .faq-item p {
+        margin-left: 0;
+    }
+}
+
+/* ===== View Instructions Button Animation (now uses pulse-light) ===== */
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    animation: pulse-light 1.8s infinite ease-in-out;  /* changed from pulse-glow to pulse-light */
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #138496, #117a8b);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(23, 162, 184, 0.3);
+    animation: none; /* stop pulsing on hover */
+}
+
+/* Pulse animation for both buttons */
+@keyframes pulse-light {
+    0% {
+        box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 12px rgba(23, 162, 184, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(23, 162, 184, 0);
+    }
+}
+
+/* Return type row above action buttons */
+.return-type-row {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.return-type-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.return-type-btn {
+    min-width: 100px;
+    padding: 0.8rem 1.5rem;
+}
+.return-type-btn.active {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+.return-type-btn.btn-secondary {
+    background: white;
+    color: var(--accent-blue);
+    border: 2px solid var(--border-blue);
+}
+.return-type-btn.btn-primary {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
 }
 
 /* Modal */
@@ -861,7 +968,7 @@ body {
     margin-top: 0.2rem;
 }
 
-/* Assessee Info in Excel Preview */
+/* Assessee Info */
 .assessee-info {
     background: var(--lighter-blue);
     padding: 1.5rem;
@@ -897,7 +1004,7 @@ body {
     font-weight: 700;
 }
 
-/* Transaction Counter in Preview Header */
+/* Transaction Counter */
 .transaction-counter {
     display: flex;
     align-items: center;
@@ -908,6 +1015,8 @@ body {
     font-weight: 600;
     color: var(--accent-blue);
 }
+
+/* Pulse animation (already defined) */
 
 /* Responsive */
 @media (max-width: 1200px) {
@@ -1020,50 +1129,4 @@ body {
         min-width: 100px;
         padding: 0.8rem;
     }
-}
-/* New button style for instructions */
-.btn-info {
-    background: linear-gradient(135deg, #17a2b8, #138496);
-    color: white;
-    border: none;
-}
-
-.btn-info:hover {
-    background: linear-gradient(135deg, #138496, #117a8b);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(23, 162, 184, 0.3);
-}
-
-/* Pulse animation for the extension button */
-@keyframes pulse-light {
-    0% {
-        box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 15px rgba(255, 140, 0, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(255, 140, 0, 0);
-    }
-}
-
-/* Improve FAQ spacing */
-.faq-item {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-blue);
-}
-
-.faq-item h3 {
-    display: flex;
-    align-items: center;
-    color: var(--primary-blue);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.faq-item p {
-    color: var(--text-medium);
-    line-height: 1.8;
-    margin-left: 2.5rem;
 }
