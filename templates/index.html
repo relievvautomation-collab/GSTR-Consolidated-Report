@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSTR-3B Consolidated Report Tool | Professional JSON Consolidation</title>
+    <title>GSTR-3B / GSTR-1 / GSTR-2A Consolidated Report Tool | Professional JSON Consolidation</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -17,8 +17,8 @@
                         <i class="fas fa-file-invoice"></i>
                     </div>
                     <div class="logo-text">
-                        <h1>GSTR-3B Consolidated Report Tool</h1>
-                        <p>Professional consolidation of monthly GSTR-3B JSON files</p>
+                        <h1>GSTR-3B / GSTR-1 / GSTR-2A Consolidated Report Tool</h1>
+                        <p>Professional consolidation of monthly GSTR JSON files</p>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1.5rem;">
@@ -34,7 +34,7 @@
             <!-- File Upload Section -->
             <section class="upload-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-cloud-upload-alt"></i> Upload GSTR-3B JSON Files</h2>
+                    <h2><i class="fas fa-cloud-upload-alt"></i> Upload GSTR JSON Files</h2>
                     <div class="file-counter">
                         <span id="fileCount">0</span> files selected
                     </div>
@@ -46,14 +46,14 @@
                         </div>
                         <h3 class="upload-text">Drag & Drop JSON Files Here</h3>
                         <p class="upload-subtext">
-                            Upload multiple monthly GSTR-3B JSON files. The tool will consolidate them into a single Excel report.
+                            Upload multiple monthly GSTR-3B, GSTR-1, or GSTR-2A JSON files. The tool will consolidate them into a single Excel report.
                         </p>
                         <button class="upload-button" id="browseButton">
                             <i class="fas fa-folder-open"></i> Browse JSON Files
                         </button>
                         <input type="file" id="fileInput" multiple accept=".json">
                         <p class="upload-subtext" style="margin-top: 1.5rem; font-size: 0.9rem;">
-                            <i class="fas fa-info-circle"></i> Only standard GSTR-3B JSON format is supported.
+                            <i class="fas fa-info-circle"></i> Only standard GSTR JSON format is supported.
                         </p>
                     </div>
                 </div>
@@ -99,6 +99,15 @@
                 </div>
             </div>
 
+            <!-- Return Type Row (above action buttons) -->
+            <div class="return-type-row">
+                <div class="return-type-selector">
+                    <button id="gstr1Btn" class="btn return-type-btn btn-secondary">GSTR-1</button>
+                    <button id="gstr3bBtn" class="btn return-type-btn active btn-primary">GSTR-3B</button>
+                    <button id="gstr2aBtn" class="btn return-type-btn btn-secondary">GSTR-2A</button>
+                </div>
+            </div>
+
             <!-- Control Buttons -->
             <div class="controls-section">
                 <button class="btn btn-primary" id="mergeBtn" disabled>
@@ -110,7 +119,7 @@
                 <button class="btn btn-success" id="downloadBtn" disabled>
                     <i class="fas fa-download"></i> Download Excel Report
                 </button>
-                <!-- View Instructions Button (right side) -->
+                <!-- View Instructions Button (right side) with animation -->
                 <button class="btn btn-info" id="viewInstructionsBtn" style="margin-left: auto;">
                     <i class="fas fa-question-circle"></i> View Instructions
                 </button>
@@ -122,7 +131,7 @@
             <!-- Preview Section -->
             <section class="preview-section">
                 <div class="preview-header">
-                    <h3><i class="fas fa-eye"></i> GSTR-3B Consolidated Preview</h3>
+                    <h3><i class="fas fa-eye"></i> Consolidated Preview</h3>
                     <div class="transaction-counter" id="monthCounter" style="display: none;">
                         <i class="fas fa-calendar-alt"></i>
                         <span id="counterValue">0</span> Months
@@ -158,52 +167,34 @@
                         <span id="previewInfo">No data parsed. Upload JSON files and click "Consolidate Files".</span>
                         <span id="rowCountInfo">Showing 0 rows</span>
                     </div>
-                    <div class="table-wrapper">
-                        <table class="preview-table" id="previewTable">
-                            <thead>
-                                <tr id="tableHeader">
-                                    <th>S.No</th>
-                                    <th>Particulars</th>
-                                    <!-- Month headers will be added dynamically -->
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="previewBody">
-                                <tr>
-                                    <td colspan="100" style="text-align: center; padding: 4rem; color: var(--text-light);">
-                                        <i class="fas fa-file-excel" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-                                        <h3 style="margin-bottom: 0.5rem; color: var(--primary-blue);">No Data to Display</h3>
-                                        <p>Upload and consolidate to see preview</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+
+                    <!-- Dynamic Preview Tabs and Content -->
+                    <div class="preview-tabs" id="previewTabs"></div>
+                    <div class="tab-content" id="previewTabContent"></div>
                 </div>
             </section>
 
             <!-- Info Panel with Tabs -->
             <section class="info-panel">
                 <div class="info-tabs">
-                    <button class="info-tab active" data-tab="format">GSTR-3B Format</button>
+                    <button class="info-tab active" data-tab="format">GSTR Format</button>
                     <button class="info-tab" data-tab="safety">Data Safety</button>
                     <button class="info-tab" data-tab="mapping">JSON Mapping</button>
                 </div>
                 <div class="tab-content-info">
                     <div class="tab-pane-info active" id="format-tab">
-                        <h3 style="color: var(--primary-blue); margin-bottom: 1.5rem;">GSTR-3B Consolidated Report Structure</h3>
+                        <h3 style="color: var(--primary-blue); margin-bottom: 1.5rem;">Consolidated Report Structure</h3>
                         <div class="info-list">
-                            <li><strong>Comprehensive Consolidation:</strong> Combines multiple monthly GSTR-3B JSON files into a single Excel workbook with two sheets: Meta_Data and GSTR-3B.</li>
-                            <li><strong>Exact Format Preservation:</strong> The output matches the official GSTR-3B return format, including all section headers and row labels exactly as specified by GSTN.</li>
-                            <li><strong>Automatic Calculations:</strong> Net ITC, total tax payable, and column-wise totals are computed automatically using built-in formulas.</li>
-                            <li><strong>Multi‑Month View:</strong> Each month's data appears in a separate column, with months sorted chronologically for easy comparison.</li>
-                            <li><strong>Zero‑Fill for Missing Values:</strong> Any field not present in a particular JSON is filled with zero, ensuring complete tables.</li>
-                            <li><strong>Header Merging:</strong> Section headers are merged across columns to maintain the original GSTR-3B appearance.</li>
-                            <li><strong>Professional Styling:</strong> Dark blue headers, light blue section backgrounds, and border lines exactly as per the standard format.</li>
+                            <li><strong>Comprehensive Consolidation:</strong> Combines multiple monthly GSTR JSON files into a single Excel workbook with Meta_Data and data sheets.</li>
+                            <li><strong>Exact Format Preservation:</strong> The output matches the official GSTR-3B, GSTR-1, or GSTR-2A format, including all section headers and row labels.</li>
+                            <li><strong>Automatic Calculations:</strong> Net ITC, total tax payable, and column-wise totals are computed automatically.</li>
+                            <li><strong>Multi‑Month View:</strong> Each month's data appears in a separate column (GSTR-3B) or as a month column in each row (GSTR-1/GSTR-2A).</li>
+                            <li><strong>Zero‑Fill for Missing Values:</strong> Any field not present in a particular JSON is filled with zero.</li>
+                            <li><strong>Professional Styling:</strong> Dark blue headers, light blue section backgrounds, and border lines.</li>
                         </div>
                         <div class="disclaimer-box">
                             <h4><i class="fas fa-exclamation-triangle"></i> Important Notes</h4>
-                            <p>This tool is designed for standard GSTR-3B JSON exports from the GST portal. Please verify the consolidated data against original returns before filing.</p>
+                            <p>This tool is designed for standard GSTR JSON exports from the GST portal. Please verify the consolidated data against original returns before filing.</p>
                         </div>
                     </div>
                     <div class="tab-pane-info" id="safety-tab">
@@ -213,8 +204,7 @@
                             <li><strong>Automatic File Cleanup:</strong> Uploaded JSON files and generated Excel reports are automatically deleted after 1 hour.</li>
                             <li><strong>No Persistent Storage:</strong> We do not store any personal or financial information permanently. Files are removed immediately after download.</li>
                             <li><strong>Encrypted Transmission:</strong> All communication between your browser and the server is encrypted (when using HTTPS).</li>
-                            <li><strong>Compliance with Indian Tax Regulations:</strong> Built with privacy‑by‑design principles to meet the data handling requirements of Indian tax professionals.</li>
-                            <li><strong>Audit Trail:</strong> Every consolidation is logged with a timestamp and file hash for traceability (logs are deleted after 24 hours).</li>
+                            <li><strong>Compliance with Indian Tax Regulations:</strong> Built with privacy‑by‑design principles.</li>
                         </div>
                         <div class="disclaimer-box">
                             <h4><i class="fas fa-shield-alt"></i> Security Disclaimer</h4>
@@ -223,27 +213,18 @@
                     </div>
                     <div class="tab-pane-info" id="mapping-tab">
                         <h3 style="color: var(--primary-blue); margin-bottom: 1.5rem;">Intelligent JSON‑to‑Excel Mapping</h3>
-                        <p>The tool uses a sophisticated mapping engine to accurately place each JSON field into the correct cell of the GSTR-3B sheet. Key mappings include:</p>
+                        <p>The tool uses a sophisticated mapping engine to accurately place each JSON field into the correct cell. Key mappings include:</p>
                         <ul style="margin-left: 2rem; color: var(--text-medium); line-height: 1.8;">
-                            <li><strong>sup_details.osup_det</strong> → Section 3.1(a) – Outward taxable supplies</li>
-                            <li><strong>sup_details.osup_zero</strong> → Section 3.1(b) – Zero rated supplies</li>
-                            <li><strong>sup_details.osup_nil_exmp</strong> → Section 3.1(c) – Nil rated / exempted</li>
-                            <li><strong>sup_details.isup_rev</strong> → Section 3.1(d) – Inward supplies under reverse charge</li>
-                            <li><strong>eco_dtls.eco_sup</strong> → Section 3.1.1(i) – ECO pays tax u/s 9(5)</li>
-                            <li><strong>inter_sup.unreg_details/comp_details/uin_details</strong> → Section 3.2 – Inter‑State supplies</li>
-                            <li><strong>itc_elg.itc_avl</strong> (by type IMPG, IMPS, ISRC, ISD, OTH) → Section 4(A) – ITC Available</li>
-                            <li><strong>itc_elg.itc_rev</strong> → Section 4(B) – ITC Reversed</li>
-                            <li><strong>itc_elg.itc_inelg</strong> → Section 4(D)(2) – Ineligible ITC</li>
-                            <li><strong>intr_ltfee.intr_details / ltfee_details</strong> → Section 5.1 – Interest & Late fee</li>
-                            <li><strong>taxpayble.returnsDbCdredList.tax_pay</strong> (with trancd 30002/30003) → Section 6.1 – Tax payable</li>
-                            <li><strong>taxpayble.returnsDbCdredList.tax_paid.pd_by_cash / pd_by_itc</strong> → Section 6.1 – Tax paid in cash / through ITC</li>
+                            <li><strong>GSTR-3B:</strong> sup_details.osup_det, sup_details.osup_zero, eco_dtls, inter_sup, itc_elg, intr_ltfee, taxpayble, etc.</li>
+                            <li><strong>GSTR-1:</strong> b2b, b2cs, cdnr, hsn sections with all invoice-level details.</li>
+                            <li><strong>GSTR-2A:</strong> b2b, cdn, tcs sections with detailed invoice and note information.</li>
                         </ul>
                         <p style="margin-top: 1rem;">All mappings are fully documented and can be extended to support future JSON schema changes.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- FAQ Section (Improved with icons and spacing) -->
+            <!-- FAQ Section (Redesigned) -->
             <section class="info-panel" style="margin-top: 1.5rem;">
                 <div class="section-header">
                     <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions (FAQs)</h2>
@@ -251,28 +232,28 @@
                 <div class="tab-content">
                     <div class="faq-container">
                         <div class="faq-item">
-                            <h3><i class="fas fa-question-circle" style="color: var(--accent-blue); margin-right: 0.8rem;"></i> 1. What types of Excel files can I merge using this tool?</h3>
-                            <p>You can merge any Excel files such as attendance sheets, salary sheets, registers, bank statements, MIS reports, or custom internal reports. The tool is designed to handle different formats, column orders, and structures, not just identical templates.</p>
+                            <h3><i class="fas fa-question-circle"></i> 1. What types of JSON files can I merge using this tool?</h3>
+                            <p>You can merge GSTR-3B, GSTR-1, or GSTR-2A JSON files downloaded from the GST portal. The tool automatically detects the return type based on your selection.</p>
                         </div>
                         <div class="faq-item">
-                            <h3><i class="fas fa-question-circle" style="color: var(--accent-blue); margin-right: 0.8rem;"></i> 2. Do all Excel files need to have the same columns or format?</h3>
-                            <p>No. Files do not need to follow the same format. The tool intelligently detects headers, aligns similar columns, and merges data logically. However, extremely unstructured files may require manual review after merging.</p>
+                            <h3><i class="fas fa-question-circle"></i> 2. Do all JSON files need to be for the same GSTIN?</h3>
+                            <p>Yes, the tool expects files from the same GSTIN. If different GSTINs are detected, you will receive an error message.</p>
                         </div>
                         <div class="faq-item">
-                            <h3><i class="fas fa-question-circle" style="color: var(--accent-blue); margin-right: 0.8rem;"></i> 3. How does the tool handle different or multi-row headers?</h3>
-                            <p>The tool automatically scans the file to identify the actual data headers, even if there are title rows. Headers span multiple rows. Cells are merged Non-data rows like titles or notes are ignored or handled separately during the merge.</p>
+                            <h3><i class="fas fa-question-circle"></i> 3. How does the tool handle missing months or fields?</h3>
+                            <p>Missing fields are filled with zero in the output. If a month is missing, it will not appear in the consolidated report.</p>
                         </div>
                         <div class="faq-item">
-                            <h3><i class="fas fa-question-circle" style="color: var(--accent-blue); margin-right: 0.8rem;"></i> 4. Will the original data in my Excel files be changed?</h3>
+                            <h3><i class="fas fa-question-circle"></i> 4. Will the original data in my JSON files be changed?</h3>
                             <p>No. Your uploaded files are never modified. The tool only creates a new merged Excel file, keeping all original data intact.</p>
                         </div>
                         <div class="faq-item">
-                            <h3><i class="fas fa-question-circle" style="color: var(--accent-blue); margin-right: 0.8rem;"></i> 5. What happens if some columns exist in one file but not in others?</h3>
-                            <p>The tool creates a combined structure that includes all detected columns. If a column is missing in a particular file, the corresponding cells in the merged output will remain blank for those rows.</p>
+                            <h3><i class="fas fa-question-circle"></i> 5. What happens if some fields exist in one file but not in others?</h3>
+                            <p>The tool creates a combined structure that includes all detected fields. If a field is missing in a particular file, the corresponding cells in the merged output will be blank or zero.</p>
                         </div>
                         <div class="faq-item">
-                            <h3><i class="fas fa-question-circle" style="color: var(--accent-blue); margin-right: 0.8rem;"></i> 6. Is this tool suitable for large or professional datasets?</h3>
-                            <p>Yes. The tool is built for real-world business data, including multi-sheet files, varying formats, and large datasets. Still, users should always review the merged output before using it for reporting or compliance purposes.</p>
+                            <h3><i class="fas fa-question-circle"></i> 6. Is this tool suitable for large or professional datasets?</h3>
+                            <p>Yes. The tool is built for real-world business data, including multi-sheet files and large datasets. Still, users should always review the merged output before using it for reporting or compliance purposes.</p>
                         </div>
                     </div>
                 </div>
@@ -283,7 +264,7 @@
         <footer class="main-footer">
             <div class="footer-content">
                 <div class="copyright">
-                    © 2024 GSTR-3B Consolidated Report Tool • Version 1.0 • Professional Edition
+                    © 2024 GSTR Consolidation Tool • Version 2.0 • Professional Edition
                 </div>
                 <div class="footer-links">
                     <a href="#"><i class="fas fa-question-circle"></i> Help</a>
@@ -321,7 +302,7 @@
                     </div>
                     <div class="disclaimer-box">
                         <h4><i class="fas fa-shield-alt"></i> Data Safety & Disclaimer</h4>
-                        <p>This Excel file was generated from your uploaded GSTR-3B JSON files. Please verify the consolidated data before using for official purposes. Files are automatically deleted after download.</p>
+                        <p>This Excel file was generated from your uploaded JSON files. Please verify the consolidated data before using for official purposes. Files are automatically deleted after download.</p>
                     </div>
                     <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
                         <button class="btn btn-success" id="confirmDownload">
@@ -335,7 +316,7 @@
             </div>
         </div>
 
-        <!-- Instructions Popup Modal (New) -->
+        <!-- Instructions Popup Modal (opens automatically on first visit) -->
         <div class="modal-overlay" id="instructionModal">
             <div class="modal" style="max-width: 800px;">
                 <div class="modal-header">
@@ -348,8 +329,8 @@
                         <li><strong>Use Google Chrome</strong> and click the button below to install the required extension.</li>
                         <li>Click <strong>“Add to Chrome”</strong> and complete the installation.</li>
                         <li><strong>Log in to GST Portal</strong> → Go to Return Dashboard → Click the 🧩 Extensions icon at the top-right → Select <strong>Taxtribute GST Assistant</strong>.</li>
-                        <li>Select <strong>Financial Year</strong> → Choose return type → Click <strong>Generate JSON</strong> → Download the ZIP file and extract all JSON files.</li>
-                        <li><strong>Return to this tool</strong> → Upload extracted JSON files (GSTR-wise) → Click <strong>Generate Report</strong> to create the consolidated Excel report.</li>
+                        <li>Select <strong>Financial Year</strong> → Choose return type (GSTR-3B, GSTR-1, or GSTR-2A) → Click <strong>Generate JSON</strong> → Download the ZIP file and extract all JSON files.</li>
+                        <li><strong>Return to this tool</strong> → Select the correct return type → Upload extracted JSON files → Click <strong>Consolidate Files</strong> to create the Excel report.</li>
                     </ol>
                     <div style="text-align: center; margin: 2rem 0;">
                         <a href="https://chromewebstore.google.com/detail/taxtribute-gst-assistant/fkkjecpbakmcejadagjnenogkdabmbep" target="_blank" class="btn btn-primary" style="background: linear-gradient(145deg, #ff8c00, #ff6a00); border: none; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4); animation: pulse-light 1.5s infinite; text-decoration: none; display: inline-flex; align-items: center; gap: 0.8rem;">
@@ -384,5 +365,4 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
-
 </html>
