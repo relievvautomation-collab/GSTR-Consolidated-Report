@@ -685,4 +685,14 @@ def download():
     return send_file(path, as_attachment=True, download_name=fname)
 
 if __name__ == '__main__':
-    app.run(host='127.199.99.20', port=5000, debug=True)
+    import os
+    
+    port = int(os.environ.get("PORT", 10000))
+    
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False
+    )
+
+
