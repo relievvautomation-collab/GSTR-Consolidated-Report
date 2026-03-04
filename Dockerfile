@@ -17,4 +17,4 @@ RUN mkdir uploads output
 EXPOSE 10000
 
 # Start application
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:10000", "app:app"]
