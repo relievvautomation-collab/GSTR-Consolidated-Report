@@ -857,9 +857,10 @@ body {
 }
 
 .summary-value {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--primary-blue);
+    word-wrap: break-word;
 }
 
 /* Footer */
