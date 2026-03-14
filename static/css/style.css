@@ -1,7 +1,7 @@
 :root {
     --primary-blue: #1e3c72;
     --secondary-blue: #2a5298;
-    --accent-blue: #4a7dff;
+    --accent-blue: #064a9c;
     --light-blue: #f0f5ff;
     --lighter-blue: #f9fbff;
     --border-blue: #d0ddff;
@@ -21,6 +21,14 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+.btn-secondary:hover{color: var(--accent-blue) !important;}
+
+.bacckground-back-vl{background: linear-gradient(135deg, #2a5298 0%, #004698 100%) !important; 
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px), linear-gradient(135deg, #2a5298 0%, #02499d 100%) !important;
+    background-size: 30px 30px, 100% 100% !important;
+    background-size: 30px 30px, 100% 100% !important;
+    background-position: 0 0, 0 0 !important;}
 
 body {
     background-color: #f8fafc;
@@ -62,11 +70,15 @@ body {
 }
 
 .logo-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-right: 1rem;
     background: rgba(255, 255, 255, 0.1);
-    padding: 0.8rem;
-    border-radius: 12px;
+    border-radius: 20px;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .logo-text h1 {
@@ -100,7 +112,7 @@ body {
 /* File Upload Section */
 .upload-section {
     background: white;
-    border-radius: 12px;
+    border-radius: 0px;
     box-shadow: 0 4px 16px var(--shadow-light);
     overflow: hidden;
 }
@@ -176,7 +188,11 @@ body {
 }
 
 .upload-button {
-    background: var(--accent-blue);
+    background: linear-gradient(135deg, #2a5298 0%, #004698 100%) !important; 
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px), linear-gradient(135deg, #2a5298 0%, #02499d 100%) !important;
+    background-size: 30px 30px, 100% 100% !important;
+    background-size: 30px 30px, 100% 100% !important;
+    background-position: 0 0, 0 0 !important;
     color: white;
     border: none;
     padding: 1rem 2.5rem;
@@ -209,7 +225,7 @@ body {
 
 .summary-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 0px;
     padding: 1.8rem;
     box-shadow: 0 4px 12px var(--shadow-light);
     display: flex;
@@ -261,7 +277,7 @@ body {
 
 .btn {
     padding: 1rem 2rem;
-    border-radius: 8px;
+    border-radius: 5px;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
@@ -353,7 +369,7 @@ body {
 /* Preview Section */
 .preview-section {
     background: white;
-    border-radius: 12px;
+    border-radius: 0px;
     box-shadow: 0 4px 16px var(--shadow-light);
     overflow: hidden;
     display: flex;
@@ -534,7 +550,7 @@ body {
 /* Info Panel */
 .info-panel {
     background: white;
-    border-radius: 12px;
+    border-radius: 0px;
     box-shadow: 0 4px 16px var(--shadow-light);
     overflow: hidden;
 }
@@ -631,8 +647,8 @@ body {
 
 .faq-item {
     background: #f9fbfe;
-    border-left: 4px solid var(--accent-blue);
-    border-radius: 8px;
+    border-left: 0px;
+    border-radius: 0px;
     padding: 1.5rem;
     box-shadow: 0 2px 8px var(--shadow-light);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -663,6 +679,7 @@ body {
     line-height: 1.7;
     margin-left: 2.2rem; /* align with text after icon */
     font-size: 0.95rem;
+    margin-bottom: 0;
 }
 
 /* Remove bottom border from old style */
@@ -694,6 +711,7 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(23, 162, 184, 0.3);
     animation: none; /* stop pulsing on hover */
+    color: #fff;
 }
 
 /* Pulse animation for both buttons */
@@ -743,7 +761,7 @@ body {
 }
 
 /* Modal */
-.modal-overlay {
+.modal-overlays {
     position: fixed;
     top: 0;
     left: 0;
@@ -757,9 +775,9 @@ body {
     padding: 1rem;
 }
 
-.modal {
+.modals {
     background: white;
-    border-radius: 12px;
+    border-radius: 0px;
     width: 100%;
     max-width: 700px;
     max-height: 90vh;
@@ -779,17 +797,17 @@ body {
     }
 }
 
-.modal-header {
+.modal-headers {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: white;
     padding: 1.8rem;
-    border-radius: 12px 12px 0 0;
+    border-radius: 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.modal-header h2 {
+.modal-headers h2 {
     font-size: 1.5rem;
     display: flex;
     align-items: center;
@@ -814,7 +832,7 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-.modal-body {
+.modal-bodys {
     padding: 2rem;
 }
 
@@ -922,6 +940,7 @@ body {
     transform: translateY(100px);
     transition: all 0.3s ease;
     pointer-events: none;
+    display: none !important;
 }
 
 .stats-container.visible {
